@@ -25,8 +25,8 @@ int main(int argc, const char * argv[])
 		output = fopen("Stdin.comp", "w");
 		
 		if (output == NULL) {
-			fprintf(stderr, "fopen ('Stdin.comp') failed: %s\n", strerror(errno));
-			return 1;
+			fprintf(stderr, "%s: fopen ('Stdin.comp') failed (%s)\n", arg[0], strerror(errno));
+			return EXIT_FAILURE;
 		}
 
 		struct compression_result result = compress(input, output);
@@ -34,7 +34,7 @@ int main(int argc, const char * argv[])
 		
 		fclose(output);
 		
-		return 0;
+		return EXIT_SUCCESS;
 	}
 	
 	for (int i = 1; i < argc; i++) {
@@ -45,14 +45,14 @@ int main(int argc, const char * argv[])
 
 		input = fopen(argv[i], "r");
 		if (input == NULL) {
-			fprintf(stderr, "fopen ('%s') failed: %s\n", argv[i], strerror(errno));
-			return 1;
+			fprintf(stderr, "%s: fopen ('%s') failed: (%s)\n", argv[0], argv[i], strerror(errno));
+			return EXIT_FAILURE;
 		}
 		
 		output = fopen(file_name_out, "w");
 		if (output == NULL) {
 			fprintf(stderr, "fopen ('%s') failed: %s\n", file_name_out, strerror(errno));
-			return 1;
+			return EXIT_SUCCESS;
 		}
 
 		struct compression_result result = compress(input, output);
