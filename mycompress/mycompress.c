@@ -13,6 +13,8 @@
 
 #define COMPRESSED_SUFFIX ".comp"
 
+extern int errno;
+
 int main(int argc, const char * argv[])
 {
 	FILE *input;
@@ -22,6 +24,11 @@ int main(int argc, const char * argv[])
 		input = stdin;
 		output = fopen("Stdin.comp", "w");
 		
+		if (output == NULL) {
+			fprintf(stderr, "fopen ('Stdin.comp') failed: %s\n", strerror(errno));
+			return 1;
+		}
+
 		struct compression_result result = compress(input, output);
 		fprintf(stdout, "%s: %i Zeichen\n%s: %i Zeichen\n", "Stdin", result.uncompressed_size, "Stdin.comp", result.compressed_size);
 		
@@ -30,16 +37,26 @@ int main(int argc, const char * argv[])
 		return 0;
 	}
 	
-	for (int i = 2; i <= argc; i++) {
-		char *file_name_out = (char *) malloc( strlen(argv[i-1]) + strlen(COMPRESSED_SUFFIX) + 1 );
-		strcpy(file_name_out, argv[i-1]);
+	for (int i = 1; i < argc; i++) {
+		char file_name_out[strlen(argv[i]) + strlen(COMPRESSED_SUFFIX) + 1];
+
+		strcpy(file_name_out, argv[i]);
 		strcat(file_name_out, COMPRESSED_SUFFIX);
+
+		input = fopen(argv[i], "r");
+		if (input == NULL) {
+			fprintf(stderr, "fopen ('%s') failed: %s\n", argv[i], strerror(errno));
+			return 1;
+		}
 		
-		input = fopen(argv[i-1], "r");
 		output = fopen(file_name_out, "w");
-		
+		if (output == NULL) {
+			fprintf(stderr, "fopen ('%s') failed: %s\n", file_name_out, strerror(errno));
+			return 1;
+		}
+
 		struct compression_result result = compress(input, output);
-		fprintf(stdout, "%s: %i Zeichen\n%s: %i Zeichen\n", argv[i-1], result.uncompressed_size, file_name_out, result.compressed_size);
+		fprintf(stdout, "%s: %i Zeichen\n%s: %i Zeichen\n", argv[i], result.uncompressed_size, file_name_out, result.compressed_size);
 		
 		fclose(input);
 		fclose(output);
