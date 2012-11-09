@@ -25,7 +25,7 @@ int main(int argc, const char * argv[])
 		output = fopen("Stdin.comp", "w");
 		
 		if (output == NULL) {
-			fprintf(stderr, "%s: fopen ('Stdin.comp') failed (%s)\n", arg[0], strerror(errno));
+			fprintf(stderr, "%s: fopen ('Stdin.comp') failed (%s)\n", argv[0], strerror(errno));
 			return EXIT_FAILURE;
 		}
 
