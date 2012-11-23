@@ -4,6 +4,8 @@ CFLAGS=-Wall -g -std=c99 -pedantic $(DEFS)
 
 OBJECTFILES=calculator.o child.o parent.o
 
+all: calculator
+
 calculator: $(OBJECTFILES)
 	$(CC) $(LDFLAGS) -o $@ $^
 %.o.: %.c %.h
