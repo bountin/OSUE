@@ -1,10 +1,12 @@
-//
-//  parent.c
-//  osue
-//
-//  Created by Martin Prebio on 23.11.12.
-//  Copyright (c) 2012 Martin Prebio. All rights reserved.
-//
+/**
+ * @file parent.c
+ * @author Martin Prebio (1025737) <martin.prebio@students.tuwien.ac.at>
+ * @date 22.11.12
+ *
+ * @brief This part of the program does the i/o with the user.
+ *
+ * Calculator Parent
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,9 +14,22 @@
 
 #include "calculator.h"
 
+/**
+ * Pipes for communication with parent.
+ */
 FILE * reading_pipe, * writing_pipe;
+
+/**
+ * Pointer to pipe structure
+ * @brief Saved global for cleanup
+ */
 int * pipes_saved;
 
+/**
+ * Cleanup parent process
+ * @brief Close fds and files and wait for the end of the child process whcih is triggered by closing the pipe.
+ * @details global variables: {writing,reading}_pipe, pipes_saved
+ */
 static void cleanup_parent()
 {
 	(void) fclose(reading_pipe);
@@ -33,12 +48,23 @@ static void cleanup_parent()
 	DEBUG ("EXIT PARENT\n");
 }
 
+/**
+ * Abort process properly
+ * @param error Error message
+ */
 static void bailout_parent(char * error)
 {
 	(void) cleanup_parent();
 	(void) bail_out(error);
 }
 
+/**
+ * Entry point of forked parent
+ * @brief Read calculation assignments from stdin, send them to the child and redirect it's response
+ * to stdout unit a EOF is received (from stdin).
+ * @param pipes 2x2 array of communication pipes
+ * @return EXIT_SUCCESS if everything worked, EXIT_FAILURE otherwise
+ */
 void parent_main(int* pipes)
 {
 	pipes_saved = pipes;

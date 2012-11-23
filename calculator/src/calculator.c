@@ -1,10 +1,13 @@
-//
-//  main.c
-//  calculator
-//
-//  Created by Martin Prebio on 22.11.12.
-//  Copyright (c) 2012 Martin Prebio. All rights reserved.
-//
+/**
+ * @file calculator.c
+ * @author Martin Prebio (1025737) <martin.prebio@students.tuwien.ac.at>
+ * @date 22.11.12
+ *
+ * @brief The program is divided in a parent process which handles i/o and a child process which does the
+ * arithmetic stuff. 
+ *
+ * Calculator: Supplies a shell for simple arithmetic operations
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -17,9 +20,17 @@
 #include "child.h"
 #include "parent.h"
 
+/**
+ * Program name for usage and error messages
+ */
 char* program_name;
 
-
+/**
+ * Shutdown function
+ * @brief Abort program in a non chaotic way by calling cleanup and exit.
+ * @param error Error message
+ * @details global variables: program_name
+ */
 void bail_out(char * error)
 {
 	(void) fprintf(stderr, "%s: ", program_name);
@@ -27,13 +38,26 @@ void bail_out(char * error)
 	exit(EXIT_FAILURE);
 }
 
+/**
+ * Mandatory usage function.
+ * @brief This function writes helpful usage information about the program to stderr.
+ * @details global variables: program_name
+ */
 static void usage(void)
 {
 	(void) fprintf(stderr, "Usage: just `%s` without any arguments\nSupplies a shell for simple arithmetic operations\n", program_name);
 	exit(EXIT_FAILURE);
 }
 
-
+/**
+ * Program entry point
+ * @brief The program is divided in a parent process which handles i/o and a child process which does the
+ * arithmetic stuff.
+ * @param argc The argument counter
+ * @param argv The argument vector
+ * @return EXIT_SUCCESS on success, EXIT_FAILURE in case of an error
+ * @details global variables: program_name
+ */
 int main(int argc, const char * argv[])
 {
 	program_name = (char *) argv[0];
