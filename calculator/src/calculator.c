@@ -17,8 +17,11 @@
 #include "child.h"
 #include "parent.h"
 
+char* program_name;
+
 void bail_out(char * error)
 {
+	fprintf(stderr, "%s: ", program_name);
 	fprintf(stderr, "%s - (%s)\n", error, strerror(errno));
 	exit(EXIT_FAILURE);
 }
@@ -26,6 +29,8 @@ void bail_out(char * error)
 
 int main(int argc, const char * argv[])
 {
+	program_name = (char *) argv[0];
+
 	/* 
 	 * First pipe is the writing for parent and reading for child
 	 * The second is vice versa
