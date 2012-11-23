@@ -21,8 +21,8 @@ char* program_name;
 
 void bail_out(char * error)
 {
-	fprintf(stderr, "%s: ", program_name);
-	fprintf(stderr, "%s - (%s)\n", error, strerror(errno));
+	(void) fprintf(stderr, "%s: ", program_name);
+	(void) fprintf(stderr, "%s - (%s)\n", error, strerror(errno));
 	exit(EXIT_FAILURE);
 }
 

@@ -16,25 +16,26 @@
 FILE * reading_pipe, * writing_pipe;
 int * pipes_saved;
 
-void cleanup_child()
+static void cleanup_child()
 {
-	fclose(writing_pipe);
-	fclose(reading_pipe);
-	close(*(pipes_saved + 0));
-	close(*(pipes_saved + 3));
+	(void) fclose(writing_pipe);
+	(void) fclose(reading_pipe);
+	(void) close(*(pipes_saved + 0));
+	(void) close(*(pipes_saved + 3));
 	
 	DEBUG("EXIT CHILD\n");
 }
 
-void bailout_child(char * error)
+static void bailout_child(char * error)
 {
-	cleanup_child();
-	bail_out(error);
+	(void) cleanup_child();
+	(void) bail_out(error);
 }
 
 void child_main(int* pipes)
 {
 	pipes_saved = pipes;
+
 	/*
 	 * First pipe is the writing for parent and reading for child
 	 * The second is vice versa
@@ -65,6 +66,9 @@ void child_main(int* pipes)
 		DEBUG("C: \t%s", read_buffer);
 		
 		/************ ZE REAL BUSINESS LOGIC *************/
+
+		// Invalid operands are silently ignored
+
 		int operand1 = strtol(strtok(read_buffer, " "), NULL, 10);
 		int operand2 = strtol(strtok(NULL, " "), NULL, 10);
 		char *operator_p = strtok(NULL, " ");
@@ -96,8 +100,12 @@ void child_main(int* pipes)
 		
 		sprintf(result, "%d", iResult);
 		
-		fprintf(writing_pipe, "%s\n", result);
-		fflush(writing_pipe);
+		if (fprintf(writing_pipe, "%s\n", result) < 0) {
+			bailout_child("Child: Writing to pipe failed");
+		}
+		if (fflush(writing_pipe) != 0) {
+			bailout_child("Child: Writing flush failed");
+		}
 	}
 	
 	if (feof(reading_pipe) == 0) {

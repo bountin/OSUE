@@ -15,12 +15,12 @@
 FILE * reading_pipe, * writing_pipe;
 int * pipes_saved;
 
-void cleanup_parent()
+static void cleanup_parent()
 {
-	fclose(reading_pipe);
-	fclose(writing_pipe);
-	close(*(pipes_saved + 1));
-	close(*(pipes_saved + 2));
+	(void) fclose(reading_pipe);
+	(void) fclose(writing_pipe);
+	(void) close(*(pipes_saved + 1));
+	(void) close(*(pipes_saved + 2));
 	
 	DEBUG ("WAIT PARENT\n");
 	
@@ -33,15 +33,16 @@ void cleanup_parent()
 	DEBUG ("EXIT PARENT\n");
 }
 
-void bailout_parent(char * error)
+static void bailout_parent(char * error)
 {
-	cleanup_parent();
-	bail_out(error);
+	(void) cleanup_parent();
+	(void) bail_out(error);
 }
 
 void parent_main(int* pipes)
 {
 	pipes_saved = pipes;
+
 	/*
 	 * First pipe is the writing for parent and reading for child
 	 * The second is vice versa
@@ -71,12 +72,16 @@ void parent_main(int* pipes)
 	while (fgets(input_buffer, MAX_INPUT_LENGTH + 1, stdin) != NULL) {
 		DEBUG("P in:\t%s", input_buffer);
 		
-		fprintf(writing_pipe, "%s", input_buffer);
-		fflush(writing_pipe);
+		if (fprintf(writing_pipe, "%s", input_buffer) < 0) {
+			bailout_parent("Parent: Writing to pipe failed");
+		}
+		if (fflush(writing_pipe) != 0) {
+			bailout_parent("Parent: Writing flush failed");
+		}
 		
 		if (fgets(return_value, MAX_RESULT_LENGTH, reading_pipe) != NULL) {
 			DEBUG("P pipe:\t%s", return_value);
-			printf("%s", return_value);
+			(void) printf("%s", return_value);
 			continue;
 		}
 		bailout_parent("Parent: fgets of readin_pipe got an error");
