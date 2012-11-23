@@ -12,29 +12,57 @@
 
 #include "calculator.h"
 
+FILE * reading_pipe, * writing_pipe;
+int * pipes_saved;
+
+void cleanup_parent()
+{
+	fclose(reading_pipe);
+	fclose(writing_pipe);
+	close(*(pipes_saved + 1));
+	close(*(pipes_saved + 2));
+	
+	DEBUG ("WAIT PARENT\n");
+	
+	int wait_result= wait(NULL);
+	
+	if (wait_result == -1) {
+		bail_out("Wait: No child process found");
+	}
+	
+	DEBUG ("EXIT PARENT\n");
+}
+
+void bailout_parent(char * error)
+{
+	cleanup_parent();
+	bail_out(error);
+}
+
 void parent_main(int* pipes)
 {
+	pipes_saved = pipes;
 	/*
 	 * First pipe is the writing for parent and reading for child
 	 * The second is vice versa
 	 */
 		   
-	FILE * writing_pipe = fdopen(*(pipes + 1), "w");
+	writing_pipe = fdopen(*(pipes + 1), "w");
 	if (writing_pipe == NULL) {
-		bail_out("parent failed opening writing pipe");
+		bailout_parent("parent failed opening writing pipe");
 	}
 	
-	FILE * reading_pipe = fdopen(*(pipes + 2), "r");
+	reading_pipe = fdopen(*(pipes + 2), "r");
 	if (reading_pipe == NULL) {
-		bail_out("parent failed opening reading pipe");
+		bailout_parent("parent failed opening reading pipe");
 	}
 	
 	// Close the other pipes
 	if (close(*(pipes + 0)) != 0) {
-		bail_out("close pipes + 1 failed");
+		bailout_parent("close pipes + 1 failed");
 	}
 	if (close(*(pipes + 3)) != 0) {
-		bail_out("close pipes + 2 failed");
+		bailout_parent("close pipes + 2 failed");
 	}
 	
 	char input_buffer[MAX_INPUT_LENGTH + 2];
@@ -51,28 +79,15 @@ void parent_main(int* pipes)
 			printf("%s", return_value);
 			continue;
 		}
-		bail_out("Parent: fgets of readin_pipe got an error");
+		bailout_parent("Parent: fgets of readin_pipe got an error");
 	}
 	
 	if (feof(stdin) == 0) {
-		bail_out("Parent: fgets of stdin failed");
+		bailout_parent("Parent: fgets of stdin failed");
 	}
 	
 	// CLEANUP
-	fclose(reading_pipe);
-	fclose(writing_pipe);
-	close(*(pipes + 1));
-	close(*(pipes + 2));
-	
-	DEBUG ("WAIT PARENT\n");
-	
-	int wait_result= wait(NULL);
-	
-	if (wait_result == -1) {
-		bail_out("Wait: No child process found");
-	}
-	
-	DEBUG ("EXIT PARENT\n");
+	cleanup_parent(pipes);
 	
 	exit (EXIT_SUCCESS);
 }

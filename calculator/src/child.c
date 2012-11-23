@@ -13,29 +13,49 @@
 
 #include "calculator.h"
 
+FILE * reading_pipe, * writing_pipe;
+int * pipes_saved;
+
+void cleanup_child()
+{
+	fclose(writing_pipe);
+	fclose(reading_pipe);
+	close(*(pipes_saved + 0));
+	close(*(pipes_saved + 3));
+	
+	DEBUG("EXIT CHILD\n");
+}
+
+void bailout_child(char * error)
+{
+	cleanup_child();
+	bail_out(error);
+}
+
 void child_main(int* pipes)
 {
+	pipes_saved = pipes;
 	/*
 	 * First pipe is the writing for parent and reading for child
 	 * The second is vice versa
 	 */
 	
-	FILE * reading_pipe = fdopen(*(pipes + 0), "r");
+	reading_pipe = fdopen(*(pipes + 0), "r");
 	if (reading_pipe == NULL) {
-		bail_out("child failed opening reading pipe");
+		bailout_child("child failed opening reading pipe");
 	}
 	
-	FILE * writing_pipe = fdopen(*(pipes + 3), "w");
+	writing_pipe = fdopen(*(pipes + 3), "w");
 	if (writing_pipe == NULL) {
-		bail_out("child failed opening writing pipe");
+		bailout_child("child failed opening writing pipe");
 	}
 	
 	// Close the other pipes
 	if (close(*(pipes + 1)) != 0) {
-		bail_out("close pipes + 1 failed");
+		bailout_child("close pipes + 1 failed");
 	}
 	if (close(*(pipes + 2)) != 0) {
-		bail_out("close pipes + 2 failed");
+		bailout_child("close pipes + 2 failed");
 	}
 	
 	// LOOP UNIT EOF
@@ -65,12 +85,12 @@ void child_main(int* pipes)
 				break;
 			case '/':
 				if (operand2 == 0) {
-					bail_out("Division through zero error");
+					bailout_child("Division through zero error");
 				}
 				iResult = operand1 / operand2;
 				break;
 			default:
-				bail_out("Unexpected operand");
+				bailout_child("Unexpected operand");
 				break;
 		}
 		
@@ -81,16 +101,11 @@ void child_main(int* pipes)
 	}
 	
 	if (feof(reading_pipe) == 0) {
-		bail_out("fgets in child");
+		bailout_child("fgets in child");
 	}
 
 	// CLEANUP
-	fclose(writing_pipe);
-	fclose(reading_pipe);
-	close(*(pipes + 0));
-	close(*(pipes + 3));
-	
-	DEBUG("EXIT CHILD\n");
+	cleanup_child();
 	
 	exit(EXIT_SUCCESS);
 }
