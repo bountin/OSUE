@@ -69,14 +69,14 @@ void child_main(int* pipes)
 
 		// Invalid operands are silently ignored
 
-		int operand1 = strtol(strtok(read_buffer, " "), NULL, 10);
-		int operand2 = strtol(strtok(NULL, " "), NULL, 10);
+		long operand1 = strtol(strtok(read_buffer, " "), NULL, 10);
+		long operand2 = strtol(strtok(NULL, " "), NULL, 10);
 		char *operator_p = strtok(NULL, " ");
 		char operator = operator_p[0];
 		
-		DEBUG("C:\tOP1=%d, OP2=%d, OP=%c\n", operand1, operand2, operator);
+		DEBUG("C:\tOP1=%ld, OP2=%ld, OP=%c\n", operand1, operand2, operator);
 		
-		int iResult;
+		long iResult;
 		switch (operator) {
 			case '+':
 				iResult = operand1 + operand2;
@@ -98,7 +98,7 @@ void child_main(int* pipes)
 				break;
 		}
 		
-		sprintf(result, "%d", iResult);
+		sprintf(result, "%ld", iResult);
 		
 		if (fprintf(writing_pipe, "%s\n", result) < 0) {
 			bailout_child("Child: Writing to pipe failed");
