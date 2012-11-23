@@ -19,6 +19,7 @@
 
 char* program_name;
 
+
 void bail_out(char * error)
 {
 	(void) fprintf(stderr, "%s: ", program_name);
@@ -26,10 +27,20 @@ void bail_out(char * error)
 	exit(EXIT_FAILURE);
 }
 
+static void usage(void)
+{
+	(void) fprintf(stderr, "Usage: just `%s` without any arguments\nSupplies a shell for simple arithmetic operations\n", program_name);
+	exit(EXIT_FAILURE);
+}
+
 
 int main(int argc, const char * argv[])
 {
 	program_name = (char *) argv[0];
+	
+	if (argc != 1) {
+		usage();
+	}
 
 	/* 
 	 * First pipe is the writing for parent and reading for child
