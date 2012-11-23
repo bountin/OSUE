@@ -1,3 +1,9 @@
+#
+#	Makefile for calculator
+#
+#	Author: Martin Prebio <martin.prebio@students.tuwien.ac.at>
+#
+
 CC=gcc
 DEFS=-D_XOPEN_SOURCE=500 -D_BSD_SOURCE -DENDEBUG
 CFLAGS=-Wall -g -std=c99 -pedantic $(DEFS)
