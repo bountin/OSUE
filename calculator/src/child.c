@@ -65,8 +65,8 @@ void child_main(int* pipes)
 		DEBUG("C: \t%s", read_buffer);
 		
 		/************ ZE REAL BUSINESS LOGIC *************/
-		int operand1 = atoi(strtok(read_buffer, " "));
-		int operand2 = atoi(strtok(NULL, " "));
+		int operand1 = strtol(strtok(read_buffer, " "), NULL, 10);
+		int operand2 = strtol(strtok(NULL, " "), NULL, 10);
 		char *operator_p = strtok(NULL, " ");
 		char operator = operator_p[0];
 		
