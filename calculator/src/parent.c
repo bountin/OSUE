@@ -51,11 +51,11 @@ void parent_main(int* pipes)
 			printf("%s", return_value);
 			continue;
 		}
-		bail_out("fgets had an error");
+		bail_out("Parent: fgets of readin_pipe got an error");
 	}
 	
 	if (feof(stdin) == 0) {
-		bail_out("Parent: fgets failed");	
+		bail_out("Parent: fgets of stdin failed");
 	}
 	
 	// CLEANUP
