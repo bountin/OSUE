@@ -1,6 +1,6 @@
 #include <sys/shm.h>
+#include <errno.h>
 #include <sem182.h>
-
 
 #define SHM_KEY 311290
 #define SEM_KEY  30192

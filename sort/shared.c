@@ -14,8 +14,6 @@
 #include <signal.h>
 #include "shared.h"
 
-extern int errno;
-
 int shm_id = -1;
 int sem_id1 = -1;
 int sem_id2 = -1;
