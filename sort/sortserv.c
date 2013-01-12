@@ -101,7 +101,9 @@ int main(int argc, const char * argv[]) {
             if (buffer_used == buffer_size) {
                 buffer_size <<= 1;
                 DEBUG("BUFFER FULL - Resizing to %ld\n", buffer_size);
-                realloc(buffer, buffer_size);
+                if (realloc(buffer, buffer_size) < 0) {
+                    (void) bailout("realloc");
+                }
             }
 
             DEBUG("Got:\t%ld\t %ld\n", buffer_used, shared_mem->data);
