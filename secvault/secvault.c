@@ -53,16 +53,16 @@ static void sv_setup_ctl_dev(struct sv_dev *dev)
 
 int sv_open(struct inode *inode, struct file *filp)
 {
-         struct sv_dev *dev; /* device information */
-         dev = container_of(inode->i_cdev, struct sv_dev, cdev);
+	struct sv_dev *dev; /* device information */
+	dev = container_of(inode->i_cdev, struct sv_dev, cdev);
 
 	if (dev->data == NULL) {
 		/* Access denied since not initialized */
 		return -EBUSY;
 	}
-         filp->private_data = dev; /* for other methods */
-	 printk(KERN_ALERT "SV: open\n");
-         return 0;          
+		filp->private_data = dev; /* for other methods */
+	printk(KERN_ALERT "SV: open\n");
+		return 0;
 }
 
 ssize_t sv_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
@@ -235,17 +235,17 @@ long sv_ctl_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 static int __init mod_init(void)
 {
-    printk(KERN_ALERT "Hello World!\n");
-    printk(KERN_INFO "The process is \"%s\" (pid %i)\n",
-             current->comm, current->pid);
+	printk(KERN_ALERT "Hello World!\n");
+	printk(KERN_INFO "The process is \"%s\" (pid %i)\n",
+			 current->comm, current->pid);
 
-    int err;
+	int err;
 
-    err = register_chrdev_region(MKDEV(231,0), 5, "secvault");
-    if (err < 0) {
-        printk(KERN_ALERT "register_chrdev_region failed");
-        return err; 
-    }
+	err = register_chrdev_region(MKDEV(231,0), 5, "secvault");
+	if (err < 0) {
+		printk(KERN_ALERT "register_chrdev_region failed");
+		return err; 
+	}
 
 	sv_setup_ctl_dev(sv_ctl_dev+0);
 
@@ -253,7 +253,7 @@ static int __init mod_init(void)
 		sv_setup_cdev(sv_devs+i, i);
 	}
 
-    return 0;
+	return 0;
 }
 
 static void __exit mod_exit(void)

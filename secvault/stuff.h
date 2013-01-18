@@ -11,11 +11,11 @@ int sv_ctl_open(struct inode *, struct file *);
 int sv_ctl_release(struct inode *, struct file *);
 
 struct file_operations sv_fops = {
-    .owner = THIS_MODULE,
-    .open = sv_open,
-    .read = sv_read,
-    .write = sv_write,
-    .release = sv_release,
+	.owner = THIS_MODULE,
+	.open = sv_open,
+	.read = sv_read,
+	.write = sv_write,
+	.release = sv_release,
 };
 
 struct file_operations sv_ctl_fops = {
@@ -27,9 +27,9 @@ struct file_operations sv_ctl_fops = {
 
 struct sv_dev {
 	char *data;  /* Pointer to encrypted memory - Set to NULL if uninitialized */
-        unsigned long size;
+	unsigned long size;
 	char key[KEY_LENGTH];
-        struct semaphore sem;     /* mutual exclusion semaphore     */
-        struct cdev cdev;     /* Char device structure      */
+	struct semaphore sem;	 /* mutual exclusion semaphore	 */
+	struct cdev cdev;	 /* Char device structure	  */
 	int owner;
 };
