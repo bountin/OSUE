@@ -52,7 +52,7 @@ int main(int argc, const char * argv[])
 		output = fopen(file_name_out, "w");
 		if (output == NULL) {
 			fprintf(stderr, "fopen ('%s') failed: %s\n", file_name_out, strerror(errno));
-			return EXIT_SUCCESS;
+			return EXIT_FAILURE;
 		}
 
 		struct compression_result result = compress(input, output);
